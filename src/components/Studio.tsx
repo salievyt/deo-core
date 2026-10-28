@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Brand, Mark } from "./Brand";
 import { ProjectVisual } from "./ProjectVisual";
+import { Partners } from "./Partners";
 import {
   projects,
   services,
@@ -460,6 +461,7 @@ export function Studio() {
             ))}
           </div>
         </section>
+        <Partners lang={lang} />
         <section className="process-section">
           <div className="container">
             <div className="section-top">

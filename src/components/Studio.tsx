@@ -145,7 +145,7 @@ export function Studio() {
             </a>
           ))}
           <button
-            className="button violet"
+            className="button accent"
             onClick={() => {
               setMenu(false);
               setForm(true);
@@ -192,7 +192,7 @@ export function Studio() {
                   "Design, development and a little courage. We build apps, websites and systems that move businesses forward.",
                 )}
               </p>
-              <button className="button violet" onClick={() => setForm(true)}>
+              <button className="button accent" onClick={() => setForm(true)}>
                 {t("Давайте создадим что-то", "Let’s build something")}
                 <ArrowUpRight size={20} />
               </button>
@@ -1023,7 +1023,7 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
                   {error}
                 </div>
               )}
-              <button className="button violet form-submit" type="submit">
+              <button className="button accent form-submit" type="submit">
                 {t("Скачать бриф", "Download brief")}
                 <ArrowUpRight size={19} />
               </button>

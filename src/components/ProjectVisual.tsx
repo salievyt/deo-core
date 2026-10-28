@@ -255,8 +255,8 @@ export function ProjectVisual({ type }: { type: string }) {
               <svg viewBox="0 0 400 140" className="chart" aria-hidden="true">
                 <defs>
                   <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop stopColor="#a3a0ff" stopOpacity=".4" />
-                    <stop offset="1" stopColor="#a3a0ff" stopOpacity="0" />
+                    <stop stopColor="#f5caaa" stopOpacity=".4" />
+                    <stop offset="1" stopColor="#f5caaa" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <path
@@ -266,7 +266,7 @@ export function ProjectVisual({ type }: { type: string }) {
                 <path
                   d="M0 120L25 105 45 115 65 87 88 97 115 60 140 79 165 65 185 74 210 45 235 52 258 32 280 46 300 20 320 30 345 15 365 25 400 6"
                   fill="none"
-                  stroke="#a29aff"
+                  stroke="#f4c7a5"
                   strokeWidth="3"
                 />
               </svg>

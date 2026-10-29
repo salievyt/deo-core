@@ -15,11 +15,11 @@ export function Mark({ className = "" }: { className?: string }) {
     </svg>
   );
 }
-export function Brand() {
+export function Brand({ name = "DEO CORE" }: { name?: string }) {
   return (
     <span className="brand">
       <Mark />
-      <span>DEO CORE</span>
+      <span>{name}</span>
     </span>
   );
 }

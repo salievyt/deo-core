@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Pause, Play } from "lucide-react";
-import { partners, type Partner } from "@/lib/partners";
+import { partners as defaultPartners, type Partner } from "@/lib/partners";
 import type { Locale } from "@/lib/content";
 
 function PartnerCard({
@@ -50,9 +50,17 @@ function PartnerCard({
   );
 }
 
-export function Partners({ lang }: { lang: Locale }) {
+export function Partners({
+  lang,
+  partners = defaultPartners,
+}: {
+  lang: Locale;
+  partners?: Partner[];
+}) {
   const [paused, setPaused] = useState(false);
   const ru = lang === "ru";
+  const repetitions = Math.max(4, Math.ceil(24 / Math.max(partners.length, 1)));
+  if (!partners.length) return null;
   const row = (reverse: boolean) => {
     const ordered = reverse
       ? [...partners.slice(3), ...partners.slice(0, 3)]
@@ -69,7 +77,10 @@ export function Partners({ lang }: { lang: Locale }) {
               key={copy}
               aria-hidden={copy === 1 || undefined}
             >
-              {[0, 1, 2, 3].flatMap((repeat) =>
+              {Array.from(
+                { length: repetitions },
+                (_, repeat) => repeat,
+              ).flatMap((repeat) =>
                 ordered.map((partner) => (
                   <PartnerCard
                     key={`${repeat}-${partner.id}`}
@@ -111,9 +122,13 @@ export function Partners({ lang }: { lang: Locale }) {
       </div>
       <div className="container partners-bottom">
         <span>
-          {ru
-            ? "Здесь появятся логотипы наших партнёров."
-            : "Our partners’ logos will appear here."}
+          {partners.some((partner) => !partner.logo)
+            ? ru
+              ? "Здесь появятся логотипы наших партнёров."
+              : "Our partners’ logos will appear here."
+            : ru
+              ? "Общие ценности. Сильные партнёрства."
+              : "Shared values. Strong partnerships."}
         </span>
         <button
           type="button"

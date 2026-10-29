@@ -1,3 +1,4 @@
+import { Attribution } from "@/components/Attribution";
 import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/inter";
 import "./globals.css";
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
+        <Attribution />
         <a className="skip-link" href="#main-content">
           К содержимому
         </a>

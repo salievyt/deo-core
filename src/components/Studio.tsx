@@ -21,15 +21,33 @@ import {
 import { Brand, Mark } from "./Brand";
 import { ProjectVisual } from "./ProjectVisual";
 import { Partners } from "./Partners";
+import type { Locale } from "@/lib/content";
+import { captureAttribution } from "@/lib/attribution";
+import { useSiteContent } from "@/lib/useSiteContent";
 import {
-  projects,
-  services,
-  processSteps,
-  articles,
-  type Locale,
-} from "@/lib/content";
-const icons = [Layers3, Code2, Smartphone, Workflow];
+  API_ENABLED,
+  ApiError,
+  apiRequest,
+  projectHref,
+  articleHref,
+} from "@/lib/api";
+const icons: Record<string, typeof Code2> = {
+  design: Layers3,
+  web: Code2,
+  mobile: Smartphone,
+  crm: Workflow,
+};
 export function Studio() {
+  const { content, contentError } = useSiteContent();
+  const {
+    projects,
+    services,
+    processSteps,
+    articles,
+    partners,
+    technologies,
+    settings,
+  } = content;
   const [lang, setLang] = useState<Locale>("ru");
   const [menu, setMenu] = useState(false);
   const [filter, setFilter] = useState("All");
@@ -38,6 +56,10 @@ export function Studio() {
   const [form, setForm] = useState(false);
   const [faq, setFaq] = useState<number | null>(null);
   const ru = lang === "ru";
+  const heroLines = (ru ? settings.hero_title_ru : settings.hero_title_en)
+    .split("\n")
+    .filter(Boolean);
+  const currentStep = processSteps[step] || processSteps[0];
   const t = (a: string, b: string) => (ru ? a : b);
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -59,11 +81,26 @@ export function Studio() {
     ["studio", t("Студия", "Studio")],
     ["insights", t("Журнал", "Insights")],
   ];
+  useEffect(() => {
+    setStep((value) => Math.min(value, Math.max(0, processSteps.length - 1)));
+  }, [processSteps.length]);
+  useEffect(() => {
+    document.title = ru ? settings.seo_title_ru : settings.seo_title_en;
+    const description = ru
+      ? settings.seo_description_ru
+      : settings.seo_description_en;
+    if (description)
+      document
+        .querySelector('meta[name="description"]')
+        ?.setAttribute("content", description);
+  }, [settings, ru]);
   const faqs = ru
     ? [
         [
           "Как начать работу над проектом?",
-          "Расскажите об идее через форму брифа. Укажите задачу, желаемый срок и ориентировочный бюджет. Форма поможет подготовить и скачать бриф. Данные остаются в вашем браузере.",
+          API_ENABLED
+            ? "Расскажите об идее через форму брифа. Укажите задачу, желаемый срок и ориентировочный бюджет. Заявка поступит команде DEO CORE."
+            : "Расскажите об идее через форму брифа. Укажите задачу, желаемый срок и ориентировочный бюджет. Форма поможет подготовить и скачать бриф. Данные остаются в вашем браузере.",
         ],
         [
           "Вы работаете с проектами с нуля?",
@@ -81,7 +118,9 @@ export function Studio() {
     : [
         [
           "How do we get started?",
-          "Tell us about your idea using the project brief. Include your goals, timeline and approximate budget. The form helps you prepare and download a brief. Your details stay in your browser.",
+          API_ENABLED
+            ? "Tell us about your idea using the project brief. Include your goals, timeline and approximate budget. Your request will reach the DEO CORE team."
+            : "Tell us about your idea using the project brief. Include your goals, timeline and approximate budget. The form helps you prepare and download a brief. Your details stay in your browser.",
         ],
         [
           "Do you build from scratch?",
@@ -101,7 +140,7 @@ export function Studio() {
       <header className="header">
         <div className="container nav">
           <Link href="/" aria-label="DEO CORE — главная">
-            <Brand />
+            <Brand name={settings.site_name} />
           </Link>
           <nav aria-label={t("Основная навигация", "Main navigation")}>
             {navigation.map(([id, label]) => (
@@ -158,6 +197,14 @@ export function Studio() {
         </nav>
       )}
       <main id="main-content">
+        {contentError && (
+          <p className="content-status" role="status">
+            {t(
+              "Не удалось обновить контент. Показана сохранённая версия сайта.",
+              "Could not refresh content. Showing the saved version of the site.",
+            )}
+          </p>
+        )}
         <section className="hero container">
           <div className="hero-eyebrow">
             <span className="eyebrow">
@@ -170,17 +217,22 @@ export function Studio() {
           </div>
           <div className="hero-heading">
             <h1>
-              {t("Превращаем идеи", "Turning ideas")}
-              <br />
-              {t("в цифровые", "into digital")}{" "}
-              <span className="headline-star">
-                <Mark />
-              </span>
-              <br />
-              <span className="hero-last">
-                {t("продукты.", "products.")}
-                <span className="period-dot" />
-              </span>
+              {heroLines.map((line, index) => (
+                <span
+                  key={index}
+                  className={
+                    index === heroLines.length - 1 ? "hero-last" : undefined
+                  }
+                >
+                  {index > 0 && <br />}
+                  {line}
+                  {index === heroLines.length - 2 && (
+                    <span className="headline-star">
+                      <Mark />
+                    </span>
+                  )}
+                </span>
+              ))}
             </h1>
             <div className="hero-aside">
               <div className="orbit-mark">
@@ -188,10 +240,9 @@ export function Studio() {
                 <span>FROM IDEA TO IMPACT</span>
               </div>
               <p>
-                {t(
-                  "Дизайн, разработка и немного смелости. Создаём приложения, сайты и системы, которые двигают бизнес вперёд.",
-                  "Design, development and a little courage. We build apps, websites and systems that move businesses forward.",
-                )}
+                {ru
+                  ? settings.hero_description_ru
+                  : settings.hero_description_en}
               </p>
               <button className="button accent" onClick={() => setForm(true)}>
                 {t("Давайте создадим что-то", "Let’s build something")}
@@ -217,7 +268,7 @@ export function Studio() {
             <div className="section-label">
               <span className="tiny-cross">✳</span>
               {t("ИЗБРАННЫЕ ПРОЕКТЫ", "SELECTED WORK")}
-              <sup>01—04</sup>
+              <sup>{String(projects.length).padStart(2, "0")}</sup>
             </div>
             <span className="subtle-note">
               {t(
@@ -247,7 +298,9 @@ export function Studio() {
                   aria-pressed={filter === f}
                 >
                   {f === "All" ? t("Все проекты", "All work") : f}
-                  {f === "All" && <sup>04</sup>}
+                  {f === "All" && (
+                    <sup>{String(projects.length).padStart(2, "0")}</sup>
+                  )}
                 </button>
               ))}
             </div>
@@ -258,17 +311,23 @@ export function Studio() {
               .map((p) => (
                 <Link
                   className={"project-card project-" + p.visual}
-                  href={"/projects/" + p.slug}
+                  href={projectHref(p.slug)}
                   key={p.slug}
                 >
                   <div className="project-image">
-                    <ProjectVisual type={p.visual} />
+                    <ProjectVisual
+                      type={p.visual}
+                      cover={p.cover}
+                      alt={p.name}
+                    />
                     <span className="project-open">
                       <ArrowUpRight size={24} />
                     </span>
-                    <span className="concept-label">
-                      {t("ВИЗУАЛЬНАЯ КОНЦЕПЦИЯ", "VISUAL CONCEPT")}
-                    </span>
+                    {p.isConcept !== false && (
+                      <span className="concept-label">
+                        {t("ВИЗУАЛЬНАЯ КОНЦЕПЦИЯ", "VISUAL CONCEPT")}
+                      </span>
+                    )}
                   </div>
                   <div className="project-meta">
                     <div>
@@ -285,10 +344,15 @@ export function Studio() {
           </div>
           <div className="projects-foot">
             <p>
-              {t(
-                "Показываем подход к продукту. Интерфейсы — концептуальные визуализации.",
-                "A glimpse of our product thinking. Interfaces are conceptual visualizations.",
-              )}
+              {projects.some((p) => p.isConcept !== false)
+                ? t(
+                    "Показываем подход к продукту. Интерфейсы с отметкой — концептуальные визуализации.",
+                    "A glimpse of our product thinking. Marked interfaces are conceptual visualizations.",
+                  )
+                : t(
+                    "Дизайн и технологии, которые работают вместе.",
+                    "Design and technology working together.",
+                  )}
             </p>
             <a className="text-link" href="#services">
               {t("Что мы можем для вас", "Explore our capabilities")}
@@ -325,7 +389,7 @@ export function Studio() {
               </div>
               <div className="service-list">
                 {services.map((s, i) => {
-                  const Icon = icons[i];
+                  const Icon = icons[s.icon] || Code2;
                   return (
                     <div
                       className={
@@ -370,8 +434,12 @@ export function Studio() {
                 {t("ИНСТРУМЕНТЫ ПОД ЗАДАЧУ", "TOOLS FOR THE CHALLENGE")}
               </span>
               <div>
-                Next.js <i>↗</i> React <i>✳</i> Flutter <i>↗</i> Python <i>✳</i>{" "}
-                Django <i>↗</i> Figma
+                {technologies.map((technology, i) => (
+                  <span key={technology.id || technology.name}>
+                    {i > 0 && <i>{i % 2 ? "↗" : "✳"}</i>}
+                    {technology.name}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -461,111 +529,108 @@ export function Studio() {
             ))}
           </div>
         </section>
-        <Partners lang={lang} />
-        <section className="process-section">
-          <div className="container">
-            <div className="section-top">
-              <div className="section-label">
-                <span className="tiny-cross">✳</span>
-                {t("КАК МЫ РАБОТАЕМ", "HOW WE WORK")}
-                <sup>04</sup>
-              </div>
-              <span className="subtle-note">
-                {t(
-                  "Понятный процесс. Предсказуемый результат.",
-                  "A clear process. A considered outcome.",
-                )}
-              </span>
-            </div>
-            <h2>
-              {t("От «есть идея»", "From “I have an idea”")}
-              <br />
-              <span className="muted">
-                {t("до «мы запустились».", "to “we’re live”.")}
-              </span>
-            </h2>
-            <div
-              className="process-tabs"
-              role="tablist"
-              aria-label={t("Этапы работы", "Process stages")}
-            >
-              {processSteps.map((s, i) => (
-                <button
-                  key={s.label}
-                  id={"step-tab-" + i}
-                  role="tab"
-                  aria-selected={step === i}
-                  tabIndex={step === i ? 0 : -1}
-                  onKeyDown={(event) => {
-                    const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
-                    if (!keys.includes(event.key)) return;
-                    event.preventDefault();
-                    const next =
-                      event.key === "Home"
-                        ? 0
-                        : event.key === "End"
-                          ? processSteps.length - 1
-                          : (i +
-                              (event.key === "ArrowRight" ? 1 : -1) +
-                              processSteps.length) %
-                            processSteps.length;
-                    setStep(next);
-                    document.getElementById("step-tab-" + next)?.focus();
-                  }}
-                  aria-controls={"step-panel-" + i}
-                  onClick={() => setStep(i)}
-                  className={step === i ? "active" : ""}
-                >
-                  <span>0{i + 1}</span>
-                  {s.label}
-                  <ArrowUpRight size={17} />
-                </button>
-              ))}
-            </div>
-            <div
-              className="process-content"
-              id={"step-panel-" + step}
-              role="tabpanel"
-              aria-labelledby={"step-tab-" + step}
-            >
-              <div className="process-visual">
-                <div className="process-orbit">
-                  <div className="process-center">
-                    <Mark />
-                  </div>
-                  {["Idea", "People", "Product", "Impact"].map((v, i) => (
-                    <span key={v} className={"orbit-tag orbit-tag-" + i}>
-                      {step === i && <i />}
-                      {v}
-                    </span>
-                  ))}
-                  <div className="orbit-path" />
+        <Partners lang={lang} partners={partners} />
+        {currentStep && (
+          <section className="process-section">
+            <div className="container">
+              <div className="section-top">
+                <div className="section-label">
+                  <span className="tiny-cross">✳</span>
+                  {t("КАК МЫ РАБОТАЕМ", "HOW WE WORK")}
+                  <sup>04</sup>
                 </div>
-                <small>GOOD QUESTIONS. BETTER PRODUCTS.</small>
-              </div>
-              <div className="process-text">
-                <span className="eyebrow">
-                  0{step + 1} / {processSteps[step].label}
+                <span className="subtle-note">
+                  {t(
+                    "Понятный процесс. Предсказуемый результат.",
+                    "A clear process. A considered outcome.",
+                  )}
                 </span>
-                <h3>{ru ? processSteps[step].title : processSteps[step].en}</h3>
-                <p>
-                  {ru ? processSteps[step].text : processSteps[step].textEn}
-                </p>
-                <ul>
-                  {(ru
-                    ? processSteps[step].items
-                    : processSteps[step].itemsEn
-                  ).map((v) => (
-                    <li key={v}>
-                      <Check size={15} />
-                      {v}
-                    </li>
-                  ))}
-                </ul>
+              </div>
+              <h2>
+                {t("От «есть идея»", "From “I have an idea”")}
+                <br />
+                <span className="muted">
+                  {t("до «мы запустились».", "to “we’re live”.")}
+                </span>
+              </h2>
+              <div
+                className="process-tabs"
+                role="tablist"
+                aria-label={t("Этапы работы", "Process stages")}
+              >
+                {processSteps.map((s, i) => (
+                  <button
+                    key={s.label}
+                    id={"step-tab-" + i}
+                    role="tab"
+                    aria-selected={step === i}
+                    tabIndex={step === i ? 0 : -1}
+                    onKeyDown={(event) => {
+                      const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+                      if (!keys.includes(event.key)) return;
+                      event.preventDefault();
+                      const next =
+                        event.key === "Home"
+                          ? 0
+                          : event.key === "End"
+                            ? processSteps.length - 1
+                            : (i +
+                                (event.key === "ArrowRight" ? 1 : -1) +
+                                processSteps.length) %
+                              processSteps.length;
+                      setStep(next);
+                      document.getElementById("step-tab-" + next)?.focus();
+                    }}
+                    aria-controls={"step-panel-" + i}
+                    onClick={() => setStep(i)}
+                    className={step === i ? "active" : ""}
+                  >
+                    <span>0{i + 1}</span>
+                    {s.label}
+                    <ArrowUpRight size={17} />
+                  </button>
+                ))}
+              </div>
+              <div
+                className="process-content"
+                id={"step-panel-" + step}
+                role="tabpanel"
+                aria-labelledby={"step-tab-" + step}
+              >
+                <div className="process-visual">
+                  <div className="process-orbit">
+                    <div className="process-center">
+                      <Mark />
+                    </div>
+                    {["Idea", "People", "Product", "Impact"].map((v, i) => (
+                      <span key={v} className={"orbit-tag orbit-tag-" + i}>
+                        {step === i && <i />}
+                        {v}
+                      </span>
+                    ))}
+                    <div className="orbit-path" />
+                  </div>
+                  <small>GOOD QUESTIONS. BETTER PRODUCTS.</small>
+                </div>
+                <div className="process-text">
+                  <span className="eyebrow">
+                    0{step + 1} / {currentStep.label}
+                  </span>
+                  <h3>{ru ? currentStep.title : currentStep.en}</h3>
+                  <p>{ru ? currentStep.text : currentStep.textEn}</p>
+                  <ul>
+                    {(ru ? currentStep.items : currentStep.itemsEn).map((v) => (
+                      <li key={v}>
+                        <Check size={15} />
+                        {v}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
         <section className="insights-section container" id="insights">
           <div className="section-top">
             <div className="section-label">
@@ -587,11 +652,18 @@ export function Studio() {
             {articles.map((a, i) => (
               <Link
                 className="article-card"
-                href={"/insights/" + a.slug}
+                href={articleHref(a.slug)}
                 key={a.slug}
               >
                 <div className={"article-art article-art-" + i}>
-                  {i === 0 ? (
+                  {a.cover ? (
+                    <img
+                      className="article-card-cover"
+                      src={a.cover}
+                      alt={ru ? a.title : a.en}
+                      loading="lazy"
+                    />
+                  ) : i === 0 ? (
                     <>
                       <span className="idea-dot">idea.</span>
                       <div className="idea-path" />
@@ -709,9 +781,39 @@ export function Studio() {
         </section>
       </main>
       <footer className="footer container">
+        {(settings.email ||
+          settings.telegram_url ||
+          settings.whatsapp_url ||
+          settings.instagram_url ||
+          settings.linkedin_url ||
+          settings.github_url) && (
+          <div className="cms-contacts">
+            {settings.email && (
+              <a href={"mailto:" + settings.email}>{settings.email} ↗</a>
+            )}
+            {[
+              ["Telegram", settings.telegram_url],
+              ["WhatsApp", settings.whatsapp_url],
+              ["Instagram", settings.instagram_url],
+              ["LinkedIn", settings.linkedin_url],
+              ["GitHub", settings.github_url],
+            ]
+              .filter(([, url]) => url)
+              .map(([label, url]) => (
+                <a
+                  key={label}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {label} ↗
+                </a>
+              ))}
+          </div>
+        )}
         <div className="footer-top">
           <Link href="/">
-            <Brand />
+            <Brand name={settings.site_name} />
           </Link>
           <span>
             INDEPENDENT MINDS.
@@ -747,8 +849,11 @@ export function Studio() {
 }
 function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const requestId = useRef<string | null>(null);
   const [selected, setSelected] = useState("Web App");
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
@@ -797,17 +902,57 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  function submit(e: FormEvent<HTMLFormElement>) {
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (status === "sending") return;
     const fd = new FormData(e.currentTarget);
     fd.set("projectType", selected);
     const fields = Object.fromEntries(
       [...fd.entries()].filter(([, v]) => typeof v === "string"),
     ) as Record<string, string>;
     setDraft(fields);
-    saveBrief(fields);
-    setStatus("success");
+    if (!API_ENABLED) {
+      saveBrief(fields);
+      setStatus("success");
+      return;
+    }
+    setStatus("sending");
+    setError("");
+    requestId.current ||= crypto.randomUUID();
+    fd.set("request_id", requestId.current);
+    fd.set("consent", "true");
+    fd.set("locale", lang);
+    for (const [key, value] of Object.entries(captureAttribution()))
+      fd.set(key, value || "");
+    const attachment = fd.get("attachment");
+    if (!(attachment instanceof File) || !attachment.name)
+      fd.delete("attachment");
+    try {
+      const receipt = await apiRequest<{ id: string }>("/project-request/", {
+        method: "POST",
+        body: fd,
+      });
+      if (!receipt.id)
+        throw new Error(
+          t(
+            "Не удалось подтвердить получение заявки.",
+            "Could not confirm your request.",
+          ),
+        );
+      setStatus("success");
+    } catch (error) {
+      setError(
+        error instanceof ApiError
+          ? error.message
+          : t(
+              "Не удалось отправить заявку. Попробуйте ещё раз.",
+              "Could not send your request. Please try again.",
+            ),
+      );
+      setStatus("error");
+    }
   }
+
   return (
     <dialog
       className="brief-dialog"
@@ -829,18 +974,29 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
         {status === "success" ? (
           <div className="success-state">
             <CheckCircle2 size={50} />
-            <h2 id="brief-title">{t("Бриф готов.", "Your brief is ready.")}</h2>
+            <h2 id="brief-title">
+              {API_ENABLED
+                ? t("Заявка получена.", "Request received.")
+                : t("Бриф готов.", "Your brief is ready.")}
+            </h2>
             <p>
-              {t(
-                "Файл сохранён на ваше устройство. Данные никуда не отправлялись. Вы можете дополнить бриф и передать его команде удобным способом.",
-                "Your brief has been downloaded. No details were sent anywhere. You can refine it and share it with the team when you are ready.",
-              )}
+              {API_ENABLED
+                ? t(
+                    "Спасибо. Мы получили вашу заявку и свяжемся с вами.",
+                    "Thank you. Your request has been received. We will be in touch.",
+                  )
+                : t(
+                    "Файл сохранён на ваше устройство. Данные никуда не отправлялись. Вы можете дополнить бриф и передать его команде удобным способом.",
+                    "Your brief has been downloaded. No details were sent anywhere. You can refine it and share it with the team when you are ready.",
+                  )}
             </p>
             <button
               className="button dark"
               onClick={() => draft && saveBrief(draft)}
             >
-              {t("Скачать ещё раз", "Download again")}
+              {API_ENABLED
+                ? t("Скачать копию брифа", "Download a copy")
+                : t("Скачать ещё раз", "Download again")}
               <ArrowUpRight size={17} />
             </button>
           </div>
@@ -856,7 +1012,7 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
                 "No specification needed. Let’s start with what matters.",
               )}
             </p>
-            <form onSubmit={submit}>
+            <form onSubmit={submit} aria-busy={status === "sending"}>
               <fieldset>
                 <legend>
                   {t("Что будем создавать?", "What are we building?")}
@@ -944,11 +1100,13 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
                     <option value="estimate">
                       {t("Нужна оценка", "Help me estimate")}
                     </option>
-                    <option>{t("до $1,000", "Under $1,000")}</option>
-                    <option>$1,000–3,000</option>
-                    <option>$3,000–5,000</option>
-                    <option>$5,000–10,000</option>
-                    <option>$10,000+</option>
+                    <option value="under-1000">
+                      {t("до $1,000", "Under $1,000")}
+                    </option>
+                    <option value="1000-3000">$1,000–3,000</option>
+                    <option value="3000-5000">$3,000–5,000</option>
+                    <option value="5000-10000">$5,000–10,000</option>
+                    <option value="10000-plus">$10,000+</option>
                   </select>
                 </label>
                 <label>
@@ -1010,10 +1168,15 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
               <label className="consent">
                 <input type="checkbox" name="consent" required />
                 <span>
-                  {t(
-                    "Данные используются только для создания файла в браузере.",
-                    "Your details are used only to generate a file in your browser.",
-                  )}{" "}
+                  {API_ENABLED
+                    ? t(
+                        "Согласен на обработку данных для ответа на заявку согласно",
+                        "I agree to data processing to respond to my request under the",
+                      )
+                    : t(
+                        "Данные используются только для создания файла в браузере.",
+                        "Your details are used only to generate a file in your browser.",
+                      )}{" "}
                   <Link href="/privacy" target="_blank">
                     Privacy Policy
                   </Link>
@@ -1023,17 +1186,43 @@ function ProjectForm({ lang, onClose }: { lang: Locale; onClose: () => void }) {
               {status === "error" && (
                 <div className="form-error" role="alert">
                   {error}
+                  {API_ENABLED && draft && (
+                    <button
+                      type="button"
+                      className="text-link"
+                      onClick={() => saveBrief(draft)}
+                    >
+                      {t(
+                        "Скачать бриф и сохранить данные",
+                        "Download your brief to keep your details",
+                      )}{" "}
+                      ↓
+                    </button>
+                  )}
                 </div>
               )}
-              <button className="button accent form-submit" type="submit">
-                {t("Скачать бриф", "Download brief")}
+              <button
+                className="button accent form-submit"
+                type="submit"
+                disabled={status === "sending"}
+              >
+                {status === "sending"
+                  ? t("Отправляем…", "Sending…")
+                  : API_ENABLED
+                    ? t("Отправить заявку", "Send request")
+                    : t("Скачать бриф", "Download brief")}
                 <ArrowUpRight size={19} />
               </button>
               <p className="form-note">
-                {t(
-                  "Бриф скачивается в формате TXT. Прикреплённый файл не загружается на сервер — добавьте его отдельно при передаче брифа.",
-                  "Your brief downloads as a TXT file. The supporting file is not uploaded — include it separately when sharing your brief.",
-                )}
+                {API_ENABLED
+                  ? t(
+                      "Контакты, описание и выбранный файл будут переданы команде DEO CORE для ответа на вашу заявку.",
+                      "Your contact details, project description and selected file will be sent to the DEO CORE team to respond to your request.",
+                    )
+                  : t(
+                      "Бриф скачивается в формате TXT. Прикреплённый файл не загружается на сервер — добавьте его отдельно при передаче брифа.",
+                      "Your brief downloads as a TXT file. The supporting file is not uploaded — include it separately when sharing your brief.",
+                    )}
               </p>
             </form>
           </>

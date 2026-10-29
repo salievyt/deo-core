@@ -6,3 +6,12 @@ node_modules/
 .DS_Store
 out/
 dist/
+backend/.venv/
+backend/db.sqlite3
+backend/media/
+backend/private_uploads/
+backend/staticfiles/
+backend/.cache/
+__pycache__/
+*.pyc
+backend/.local-admin.txt

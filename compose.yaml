@@ -1,0 +1,87 @@
+name: deo-core
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: deo_core
+      POSTGRES_USER: deo_core
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deo_core -d deo_core"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save "" --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://deo_core:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/deo_core
+      REDIS_URL: redis://redis:6379/1
+      DJANGO_TRUST_PROXY: "true"
+      DJANGO_NUM_PROXIES: "1"
+    volumes:
+      - public_media:/app/media
+      - private_uploads:/app/private_uploads
+      - staticfiles:/app/staticfiles
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/api/health/',headers={'X-Forwarded-Proto':'https'}),timeout=5)",
+        ]
+      interval: 15s
+      start_period: 30s
+      timeout: 8s
+      retries: 5
+    restart: unless-stopped
+  web:
+    image: nginx:1.28-alpine
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./out:/usr/share/nginx/html:ro
+      - public_media:/srv/media:ro
+      - staticfiles:/srv/static:ro
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+  crm-worker:
+    profiles: [crm]
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://deo_core:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/deo_core
+      REDIS_URL: redis://redis:6379/1
+    entrypoint: ["sh", "-c"]
+    command:
+      [
+        "while true; do python manage.py process_crm_queue --limit 20; sleep 60; done",
+      ]
+    volumes:
+      - private_uploads:/app/private_uploads
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+volumes:
+  postgres_data:
+  public_media:
+  private_uploads:
+  staticfiles:

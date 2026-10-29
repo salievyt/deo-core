@@ -1,5 +1,13 @@
 export type Locale = "ru" | "en";
 export type Project = {
+  cover?: string | null;
+  year?: number;
+  status?: string;
+  isConcept?: boolean;
+  ideaEn?: string;
+  solutionEn?: string;
+  result?: string;
+  resultEn?: string;
   slug: string;
   name: string;
   type: string;

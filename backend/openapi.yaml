@@ -1,0 +1,1624 @@
+openapi: 3.0.3
+info:
+  title: DEO CORE API
+  version: 1.0.0
+  description: Публичный контент сайта и приём заявок. Редактирование — через Jazzmin
+    /admin/.
+paths:
+  /api/articles/:
+    get:
+      operationId: articles_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - articles
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedArticleList'
+          description: ''
+  /api/articles/{slug}/:
+    get:
+      operationId: articles_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+          title: URL
+        required: true
+      tags:
+      - articles
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+          description: ''
+  /api/contact/:
+    post:
+      operationId: contact_create
+      tags:
+      - contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadReceipt'
+          description: ''
+  /api/health/:
+    get:
+      operationId: health_retrieve
+      tags:
+      - health
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: ''
+  /api/jobs/:
+    get:
+      operationId: jobs_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - jobs
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJobList'
+          description: ''
+  /api/jobs/{slug}/:
+    get:
+      operationId: jobs_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+          title: URL
+        required: true
+      tags:
+      - jobs
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: ''
+  /api/partners/:
+    get:
+      operationId: partners_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - partners
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPartnerList'
+          description: ''
+  /api/partners/{id}/:
+    get:
+      operationId: partners_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Партнёр.
+        required: true
+      tags:
+      - partners
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+          description: ''
+  /api/process/:
+    get:
+      operationId: process_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - process
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProcessStepList'
+          description: ''
+  /api/process/{id}/:
+    get:
+      operationId: process_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Этап работы.
+        required: true
+      tags:
+      - process
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessStep'
+          description: ''
+  /api/project-request/:
+    post:
+      operationId: project_request_create
+      tags:
+      - project-request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadReceipt'
+          description: ''
+  /api/projects/:
+    get:
+      operationId: projects_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - projects
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectList'
+          description: ''
+  /api/projects/{slug}/:
+    get:
+      operationId: projects_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+          title: URL
+        required: true
+      tags:
+      - projects
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+  /api/services/:
+    get:
+      operationId: services_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - services
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServiceList'
+          description: ''
+  /api/services/{id}/:
+    get:
+      operationId: services_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Услуга.
+        required: true
+      tags:
+      - services
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+          description: ''
+  /api/settings/:
+    get:
+      operationId: settings_retrieve
+      tags:
+      - settings
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteSettings'
+          description: ''
+  /api/site/:
+    get:
+      operationId: site_retrieve
+      tags:
+      - site
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteSnapshot'
+          description: ''
+  /api/statistics/:
+    get:
+      operationId: statistics_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - statistics
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStatisticList'
+          description: ''
+  /api/statistics/{id}/:
+    get:
+      operationId: statistics_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Показатель.
+        required: true
+      tags:
+      - statistics
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistic'
+          description: ''
+  /api/team/:
+    get:
+      operationId: team_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - team
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTeamList'
+          description: ''
+  /api/team/{id}/:
+    get:
+      operationId: team_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Участник команды.
+        required: true
+      tags:
+      - team
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+          description: ''
+  /api/technologies/:
+    get:
+      operationId: technologies_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - technologies
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTechnologyList'
+          description: ''
+  /api/technologies/{id}/:
+    get:
+      operationId: technologies_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Технология.
+        required: true
+      tags:
+      - technologies
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Technology'
+          description: ''
+  /api/testimonials/:
+    get:
+      operationId: testimonials_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - testimonials
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTestimonialList'
+          description: ''
+  /api/testimonials/{id}/:
+    get:
+      operationId: testimonials_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Отзыв.
+        required: true
+      tags:
+      - testimonials
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testimonial'
+          description: ''
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        slug:
+          type: string
+          title: URL
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        title:
+          type: string
+        en:
+          type: string
+        category:
+          type: string
+          title: Категория
+          maxLength: 60
+        body:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        bodyEn:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        time:
+          type: string
+          readOnly: true
+        author:
+          type: string
+          title: Автор
+          maxLength: 160
+        cover:
+          type: string
+          format: uri
+          nullable: true
+          title: Обложка
+        published_at:
+          type: string
+          format: date
+          nullable: true
+          title: Дата публикации
+        seo_title:
+          type: string
+          maxLength: 200
+        seo_description:
+          type: string
+          maxLength: 350
+      required:
+      - body
+      - bodyEn
+      - en
+      - slug
+      - time
+      - title
+    BudgetEnum:
+      enum:
+      - estimate
+      - under-1000
+      - 1000-3000
+      - 3000-5000
+      - 5000-10000
+      - 10000-plus
+      type: string
+      description: |-
+        * `estimate` - Нужна оценка
+        * `under-1000` - до $1,000
+        * `1000-3000` - $1,000–3,000
+        * `3000-5000` - $3,000–5,000
+        * `5000-10000` - $5,000–10,000
+        * `10000-plus` - $10,000+
+    ContactRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Имя
+          maxLength: 120
+        company:
+          type: string
+          title: Компания
+          maxLength: 160
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        contact:
+          type: string
+          title: Телефон / Telegram
+          maxLength: 150
+        projectType:
+          allOf:
+          - $ref: '#/components/schemas/ProjectTypeEnum'
+          default: Other
+        description:
+          type: string
+          minLength: 10
+          maxLength: 5000
+        budget:
+          allOf:
+          - $ref: '#/components/schemas/BudgetEnum'
+          title: Бюджет
+        timeline:
+          allOf:
+          - $ref: '#/components/schemas/TimelineEnum'
+          title: Срок
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          title: Язык
+        consent:
+          type: boolean
+        referrer:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 2000
+          - type: string
+            maxLength: 0
+        utm_source:
+          type: string
+          maxLength: 250
+        utm_medium:
+          type: string
+          maxLength: 250
+        utm_campaign:
+          type: string
+          maxLength: 250
+        utm_term:
+          type: string
+          maxLength: 250
+        utm_content:
+          type: string
+          maxLength: 250
+        attachment:
+          type: string
+          format: binary
+          writeOnly: true
+        website:
+          type: string
+          writeOnly: true
+          maxLength: 200
+        request_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        message:
+          type: string
+          writeOnly: true
+          minLength: 10
+          maxLength: 5000
+      required:
+      - consent
+      - email
+      - name
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    IconEnum:
+      enum:
+      - design
+      - web
+      - mobile
+      - crm
+      type: string
+      description: |-
+        * `design` - design
+        * `web` - web
+        * `mobile` - mobile
+        * `crm` - crm
+    Job:
+      type: object
+      properties:
+        slug:
+          type: string
+          title: URL
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        title_ru:
+          type: string
+          title: Название RU
+          maxLength: 200
+        title_en:
+          type: string
+          title: Название EN
+          maxLength: 200
+        work_format:
+          type: string
+          title: Формат работы
+          maxLength: 150
+        description_ru:
+          type: string
+          title: Описание RU
+        description_en:
+          type: string
+          title: Описание EN
+        requirements_ru:
+          type: string
+          title: Требования RU
+        requirements_en:
+          type: string
+          title: Требования EN
+      required:
+      - description_ru
+      - slug
+      - title_en
+      - title_ru
+    LeadReceipt:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        message:
+          type: string
+      required:
+      - id
+      - message
+    LeadRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Имя
+          maxLength: 120
+        company:
+          type: string
+          title: Компания
+          maxLength: 160
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        contact:
+          type: string
+          title: Телефон / Telegram
+          maxLength: 150
+        projectType:
+          $ref: '#/components/schemas/ProjectTypeEnum'
+        description:
+          type: string
+          minLength: 10
+          maxLength: 5000
+        budget:
+          allOf:
+          - $ref: '#/components/schemas/BudgetEnum'
+          title: Бюджет
+        timeline:
+          allOf:
+          - $ref: '#/components/schemas/TimelineEnum'
+          title: Срок
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          title: Язык
+        consent:
+          type: boolean
+        referrer:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 2000
+          - type: string
+            maxLength: 0
+        utm_source:
+          type: string
+          maxLength: 250
+        utm_medium:
+          type: string
+          maxLength: 250
+        utm_campaign:
+          type: string
+          maxLength: 250
+        utm_term:
+          type: string
+          maxLength: 250
+        utm_content:
+          type: string
+          maxLength: 250
+        attachment:
+          type: string
+          format: binary
+          writeOnly: true
+        website:
+          type: string
+          writeOnly: true
+          maxLength: 200
+        request_id:
+          type: string
+          format: uuid
+          writeOnly: true
+      required:
+      - consent
+      - description
+      - email
+      - name
+      - projectType
+    LocaleEnum:
+      enum:
+      - ru
+      - en
+      type: string
+      description: |-
+        * `ru` - Русский
+        * `en` - English
+    PaginatedArticleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+    PaginatedJobList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Job'
+    PaginatedPartnerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Partner'
+    PaginatedProcessStepList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcessStep'
+    PaginatedProjectList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+    PaginatedServiceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+    PaginatedStatisticList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Statistic'
+    PaginatedTeamList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+    PaginatedTechnologyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Technology'
+    PaginatedTestimonialList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Testimonial'
+    Partner:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Название / подпись
+          maxLength: 150
+        logo:
+          type: string
+          format: uri
+          nullable: true
+          title: Логотип
+          description: PNG, JPG, WEBP или статичный SVG, до 5 MB. Без файла выводится
+            место для логотипа.
+      required:
+      - id
+      - name
+    ProcessStep:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+        en:
+          type: string
+        label:
+          type: string
+          title: Краткое название
+          maxLength: 100
+        text:
+          type: string
+        textEn:
+          type: string
+        items: {}
+        itemsEn: {}
+      required:
+      - en
+      - id
+      - items
+      - itemsEn
+      - label
+      - text
+      - textEn
+      - title
+    Project:
+      type: object
+      properties:
+        slug:
+          type: string
+          title: URL
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          title: Название
+          maxLength: 160
+        type:
+          type: string
+        category:
+          allOf:
+          - $ref: '#/components/schemas/ProjectCategoryEnum'
+          title: Категория
+        industry:
+          type: string
+          title: Индустрия
+          maxLength: 80
+        description:
+          type: string
+        descriptionEn:
+          type: string
+        idea:
+          type: string
+        ideaEn:
+          type: string
+        solution:
+          type: string
+        solutionEn:
+          type: string
+        result:
+          type: string
+        resultEn:
+          type: string
+        visual:
+          allOf:
+          - $ref: '#/components/schemas/VisualEnum'
+          title: Резервный макет
+        cover:
+          type: string
+          format: uri
+          nullable: true
+          title: Обложка
+        tags:
+          title: Теги / технологии
+          description: 'Например: ["Product design", "React"]'
+        year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+          title: Год
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          title: Статус
+        isConcept:
+          type: boolean
+        seo_title:
+          type: string
+          maxLength: 200
+        seo_description:
+          type: string
+          maxLength: 350
+      required:
+      - category
+      - description
+      - descriptionEn
+      - idea
+      - ideaEn
+      - isConcept
+      - name
+      - result
+      - resultEn
+      - slug
+      - solution
+      - solutionEn
+      - type
+    ProjectCategoryEnum:
+      enum:
+      - Web
+      - Mobile
+      - CRM
+      - UI/UX
+      - Internal Systems
+      - E-commerce
+      type: string
+      description: |-
+        * `Web` - Web
+        * `Mobile` - Mobile
+        * `CRM` - CRM
+        * `UI/UX` - UI/UX
+        * `Internal Systems` - Internal Systems
+        * `E-commerce` - E-commerce
+    ProjectTypeEnum:
+      enum:
+      - Mobile App
+      - Website
+      - Web App
+      - CRM
+      - UI/UX
+      - Automation
+      - Other
+      type: string
+      description: |-
+        * `Mobile App` - Mobile App
+        * `Website` - Website
+        * `Web App` - Web App
+        * `CRM` - CRM
+        * `UI/UX` - UI/UX
+        * `Automation` - Automation
+        * `Other` - Other
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название
+          maxLength: 150
+        ru:
+          type: string
+        en:
+          type: string
+        tags:
+          title: Компетенции
+        icon:
+          allOf:
+          - $ref: '#/components/schemas/IconEnum'
+          title: Иконка
+      required:
+      - en
+      - id
+      - ru
+      - title
+    SiteSettings:
+      type: object
+      properties:
+        site_name:
+          type: string
+          title: Название
+          maxLength: 120
+        hero_title_ru:
+          type: string
+          title: Заголовок RU
+          description: Одна строка текста — одна строка заголовка.
+        hero_title_en:
+          type: string
+          title: Заголовок EN
+        hero_description_ru:
+          type: string
+          title: Описание RU
+        hero_description_en:
+          type: string
+          title: Описание EN
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        telegram_url:
+          title: Telegram
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        whatsapp_url:
+          title: WhatsApp
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        instagram_url:
+          title: Instagram
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        linkedin_url:
+          title: LinkedIn
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        github_url:
+          title: GitHub
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        address_ru:
+          type: string
+          title: Адрес RU
+          maxLength: 300
+        address_en:
+          type: string
+          title: Адрес EN
+          maxLength: 300
+        seo_title_ru:
+          type: string
+          maxLength: 200
+        seo_title_en:
+          type: string
+          maxLength: 200
+        seo_description_ru:
+          type: string
+          maxLength: 350
+        seo_description_en:
+          type: string
+          maxLength: 350
+    SiteSnapshot:
+      type: object
+      properties:
+        settings:
+          allOf:
+          - $ref: '#/components/schemas/SiteSettings'
+          nullable: true
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+        processSteps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcessStep'
+        partners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Partner'
+        articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        technologies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Technology'
+      required:
+      - articles
+      - partners
+      - processSteps
+      - projects
+      - services
+      - settings
+      - technologies
+    Statistic:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        label_ru:
+          type: string
+          title: Подпись RU
+          maxLength: 120
+        label_en:
+          type: string
+          title: Подпись EN
+          maxLength: 120
+        value:
+          type: string
+          title: Значение
+          maxLength: 30
+      required:
+      - id
+      - label_en
+      - label_ru
+      - value
+    StatusEnum:
+      enum:
+      - released
+      - development
+      - concept
+      - internal
+      - nda
+      type: string
+      description: |-
+        * `released` - Выпущен
+        * `development` - В разработке
+        * `concept` - Концепция
+        * `internal` - Внутренний продукт
+        * `nda` - NDA
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Имя
+          maxLength: 150
+        role_ru:
+          type: string
+          title: Должность RU
+          maxLength: 150
+        role_en:
+          type: string
+          title: Должность EN
+          maxLength: 150
+        bio_ru:
+          type: string
+          title: О себе RU
+        bio_en:
+          type: string
+          title: О себе EN
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        linkedin_url:
+          title: LinkedIn
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        github_url:
+          title: GitHub
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+      required:
+      - id
+      - name
+      - role_en
+      - role_ru
+    Technology:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/TechnologyCategoryEnum'
+          title: Направление
+      required:
+      - category
+      - id
+      - name
+    TechnologyCategoryEnum:
+      enum:
+      - Mobile
+      - Frontend
+      - Backend
+      - Infrastructure
+      - Design
+      type: string
+      description: |-
+        * `Mobile` - Mobile
+        * `Frontend` - Frontend
+        * `Backend` - Backend
+        * `Infrastructure` - Infrastructure
+        * `Design` - Design
+    Testimonial:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Имя
+          maxLength: 150
+        company:
+          type: string
+          title: Компания
+          maxLength: 150
+        role:
+          type: string
+          title: Должность
+          maxLength: 150
+        text_ru:
+          type: string
+          title: Отзыв RU
+        text_en:
+          type: string
+          title: Отзыв EN
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото / логотип
+        project:
+          type: string
+          nullable: true
+          readOnly: true
+      required:
+      - company
+      - id
+      - name
+      - project
+      - text_ru
+    TimelineEnum:
+      enum:
+      - flexible
+      - asap
+      - 1-2 months
+      - 3-6 months
+      type: string
+      description: |-
+        * `flexible` - Не определён
+        * `asap` - Как можно быстрее
+        * `1-2 months` - 1–2 месяца
+        * `3-6 months` - 3–6 месяцев
+    VisualEnum:
+      enum:
+      - crm
+      - mobile
+      - exchange
+      - education
+      type: string
+      description: |-
+        * `crm` - crm
+        * `mobile` - mobile
+        * `exchange` - exchange
+        * `education` - education

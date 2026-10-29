@@ -11,7 +11,21 @@ import {
   ArrowRight,
   Play,
 } from "lucide-react";
-export function ProjectVisual({ type }: { type: string }) {
+export function ProjectVisual({
+  type,
+  cover,
+  alt = "",
+}: {
+  type: string;
+  cover?: string | null;
+  alt?: string;
+}) {
+  if (cover)
+    return (
+      <div className="project-art cms-cover">
+        <img src={cover} alt={alt} loading="lazy" />
+      </div>
+    );
   if (type === "crm")
     return (
       <div

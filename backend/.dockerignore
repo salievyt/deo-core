@@ -1,0 +1,12 @@
+.venv
+.env
+.env.*
+!.env.example
+.local-admin.txt
+db.sqlite3
+media
+private_uploads
+staticfiles
+.cache
+__pycache__
+*.pyc

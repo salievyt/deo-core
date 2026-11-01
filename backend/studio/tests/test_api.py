@@ -231,7 +231,9 @@ class ApiTests(APITestCase):
         self.assertEqual(Project.objects.count(), 4)
         self.assertEqual(Project.objects.get(pk=project.pk).name, "Edited name")
 
-    @override_settings(CRM_WEBHOOK_URL="https://crm.example.test/leads")
+    @override_settings(
+        CRM_WEBHOOK_URL="https://crm.example.test/leads", CRM_INTEGRATION_MODE="generic"
+    )
     def test_delivery_queue_records_and_retries_without_losing_lead(self):
         self.client.post("/api/project-request/", self.payload(), format="json")
         delivery = LeadDelivery.objects.get()

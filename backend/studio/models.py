@@ -442,6 +442,12 @@ class LeadDelivery(models.Model):
         SENT = "sent", "Доставлено"
         FAILED = "failed", "Ошибка"
 
+    destination_url = models.URLField(
+        "Адрес доставки", max_length=1000, blank=True, editable=False
+    )
+    crm_lead_id = models.UUIDField(
+        "ID лида в DEO CRM", null=True, blank=True, editable=False
+    )
     lead = models.OneToOneField(Lead, verbose_name="Заявка", on_delete=models.CASCADE)
     status = models.CharField(
         "Статус", max_length=20, choices=Status.choices, default=Status.PENDING
